@@ -15,8 +15,9 @@
     <section>
       <h2>إدارة النظام</h2>
       <button onclick="showAddUserForm()">إضافة مستخدم</button>
+      <button onclick="viewUsers()">عرض المستخدمين</button>
       <button onclick="lockGrades()">إغلاق تسجيل الدرجات</button>
-      <button onclick="viewActivities()">عرض النشاطات</button>
+      <button onclick="unlockGrades()">فتح تسجيل الدرجات</button>
     </section>
 
     <section id="add-user-form" class="hidden">
@@ -34,6 +35,11 @@
         <input type="text" id="user-id" required>
         <button type="submit">إضافة</button>
       </form>
+    </section>
+
+    <section id="users-list" class="hidden">
+      <h2>قائمة المستخدمين</h2>
+      <ul id="users"></ul>
     </section>
   </main>
 
