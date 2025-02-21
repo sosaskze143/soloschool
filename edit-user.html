@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تعديل المستخدم - SoloSchool</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>تعديل المستخدم</h1>
+  </header>
+
+  <main>
+    <section id="edit-user-form">
+      <h2>تعديل المستخدم</h2>
+      <form id="edit-form">
+        <label for="edit-full-name">الاسم الكامل:</label>
+        <input type="text" id="edit-full-name" required>
+        <label for="edit-user-id">رقم الهوية:</label>
+        <input type="text" id="edit-user-id" required readonly>
+        <label for="edit-gender">الجنس:</label>
+        <select id="edit-gender">
+          <option value="male">ذكر</option>
+          <option value="female">أنثى</option>
+        </select>
+        <label for="edit-birthdate">تاريخ الميلاد:</label>
+        <input type="date" id="edit-birthdate" required>
+        <label for="edit-parent-name">اسم ولي الأمر:</label>
+        <input type="text" id="edit-parent-name">
+        <label for="edit-phone-number">رقم الهاتف:</label>
+        <input type="tel" id="edit-phone-number" required>
+        <button type="submit">حفظ التعديلات</button>
+      </form>
+      <button onclick="deleteUser()">حذف المستخدم</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 SoloSchool. جميع الحقوق محفوظة.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
