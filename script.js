@@ -3,21 +3,6 @@ let users = JSON.parse(localStorage.getItem('users')) || [
   { id: 1, username: 'admin', password: 'admin', role: 'admin' }
 ];
 
-// بيانات الدرجات (يتم تخزينها في localStorage)
-let grades = JSON.parse(localStorage.getItem('grades')) || [];
-
-// بيانات المقررات (يتم تخزينها في localStorage)
-let courses = JSON.parse(localStorage.getItem('courses')) || [];
-
-// بيانات الاختبارات (يتم تخزينها في localStorage)
-let exams = JSON.parse(localStorage.getItem('exams')) || [];
-
-// بيانات الإجازات (يتم تخزينها في localStorage)
-let holidays = JSON.parse(localStorage.getItem('holidays')) || [];
-
-// بيانات الإشعارات (يتم تخزينها في localStorage)
-let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-
 // تسجيل الدخول
 document.getElementById('login-form')?.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -45,24 +30,32 @@ document.getElementById('user-form')?.addEventListener('submit', function (e) {
   e.preventDefault(); // منع إعادة تحميل الصفحة
 
   const userType = document.getElementById('user-type').value;
-  const userName = document.getElementById('user-name').value;
+  const fullName = document.getElementById('full-name').value;
   const userId = document.getElementById('user-id').value;
+  const gender = document.getElementById('gender').value;
+  const birthdate = document.getElementById('birthdate').value;
+  const parentName = document.getElementById('parent-name').value;
+  const phoneNumber = document.getElementById('phone-number').value;
   const password = generatePassword(); // توليد كلمة مرور تلقائيًا
 
   const newUser = {
     id: userId,
-    username: userName,
+    username: userId, // اسم المستخدم هو رقم الهوية
     password: password,
-    role: userType
+    role: userType,
+    fullName: fullName,
+    gender: gender,
+    birthdate: birthdate,
+    parentName: parentName,
+    phoneNumber: phoneNumber
   };
 
   users.push(newUser);
   localStorage.setItem('users', JSON.stringify(users));
   alert(`تمت إضافة المستخدم بنجاح. كلمة المرور: ${password}`);
 
-  // تحديث واجهة المستخدم
   viewUsers();
-  document.getElementById('user-form').reset(); // إعادة تعيين النموذج
+  document.getElementById('user-form').reset();
 });
 
 // عرض المستخدمين
@@ -70,47 +63,40 @@ function viewUsers() {
   const usersList = document.getElementById('users');
   usersList.innerHTML = '';
   users.forEach(user => {
-    const li = document.createElement('li');
-    li.textContent = `اسم المستخدم: ${user.username} - الدور: ${user.role}`;
-    usersList.appendChild(li);
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${user.fullName}</td>
+      <td>${user.id}</td>
+      <td>${user.gender === 'male' ? 'ذكر' : 'أنثى'}</td>
+      <td>${user.birthdate}</td>
+      <td>${user.parentName || 'غير متوفر'}</td>
+      <td>${user.phoneNumber}</td>
+      <td>${user.role === 'teacher' ? 'معلم' : user.role === 'student' ? 'طالب' : 'ولي أمر'}</td>
+      <td>
+        <button onclick="editUser('${user.id}')">تعديل</button>
+        <button onclick="deleteUser('${user.id}')">حذف</button>
+      </td>
+    `;
+    usersList.appendChild(row);
   });
   document.getElementById('users-list').classList.remove('hidden');
 }
 
-// عرض كلمات السر
-function viewPasswords() {
-  const passwordsList = document.getElementById('passwords');
-  passwordsList.innerHTML = '';
-  users.forEach(user => {
-    const li = document.createElement('li');
-    li.textContent = `اسم المستخدم: ${user.username} - كلمة السر: ${user.password}`;
-    passwordsList.appendChild(li);
-  });
-  document.getElementById('passwords-list').classList.remove('hidden');
-}
-
-// تعديل مستخدم
-function editUser() {
-  const userId = prompt("أدخل رقم هوية المستخدم الذي تريد تعديله:");
-  const user = users.find(u => u.id == userId);
+// تعديل المستخدم
+function editUser(userId) {
+  const user = users.find(u => u.id === userId);
   if (user) {
-    const newUsername = prompt("أدخل اسم المستخدم الجديد:", user.username);
-    const newPassword = prompt("أدخل كلمة السر الجديدة:", user.password);
-    user.username = newUsername;
-    user.password = newPassword;
-    localStorage.setItem('users', JSON.stringify(users));
-    alert('تم تعديل المستخدم بنجاح');
-  } else {
-    alert('المستخدم غير موجود');
+    localStorage.setItem('editUserId', userId); // حفظ رقم الهوية للتعديل
+    window.location.href = 'edit-user.html'; // توجيه إلى صفحة التعديل
   }
 }
 
-// حذف مستخدم
-function deleteUser() {
-  const userId = prompt("أدخل رقم هوية المستخدم الذي تريد حذفه:");
-  users = users.filter(u => u.id != userId);
+// حذف المستخدم
+function deleteUser(userId) {
+  users = users.filter(u => u.id !== userId);
   localStorage.setItem('users', JSON.stringify(users));
   alert('تم حذف المستخدم بنجاح');
+  viewUsers();
 }
 
 // توليد كلمة مرور تلقائيًا
@@ -118,71 +104,19 @@ function generatePassword() {
   return Math.random().toString(36).slice(-8);
 }
 
-// إضافة مقرر
-function addCourse() {
-  const courseName = prompt("أدخل اسم المقرر:");
-  if (courseName) {
-    courses.push({ name: courseName });
-    localStorage.setItem('courses', JSON.stringify(courses));
-    alert('تم إضافة المقرر بنجاح');
-  }
-}
+// تحميل التقرير كملف PDF
+function downloadReport() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-// حذف مقرر
-function deleteCourse() {
-  const courseName = prompt("أدخل اسم المقرر الذي تريد حذفه:");
-  courses = courses.filter(c => c.name != courseName);
-  localStorage.setItem('courses', JSON.stringify(courses));
-  alert('تم حذف المقرر بنجاح');
-}
+  doc.text("تقرير المستخدمين", 10, 10);
+  users.forEach((user, index) => {
+    doc.text(
+      `الاسم: ${user.fullName}, رقم الهوية: ${user.id}, النوع: ${user.role}`,
+      10,
+      20 + (index * 10)
+    );
+  });
 
-// تعيين مقرر للمعلم
-function assignCourseToTeacher() {
-  const teacherId = prompt("أدخل رقم هوية المعلم:");
-  const courseName = prompt("أدخل اسم المقرر:");
-  const teacher = users.find(u => u.id == teacherId && u.role == 'teacher');
-  if (teacher) {
-    teacher.courses = teacher.courses || [];
-    teacher.courses.push(courseName);
-    localStorage.setItem('users', JSON.stringify(users));
-    alert('تم تعيين المقرر للمعلم بنجاح');
-  } else {
-    alert('المعلم غير موجود');
-  }
-}
-
-// إضافة اختبار
-function addExam() {
-  const examName = prompt("أدخل اسم الاختبار:");
-  const examDate = prompt("أدخل تاريخ الاختبار (YYYY-MM-DD):");
-  exams.push({ name: examName, date: examDate });
-  localStorage.setItem('exams', JSON.stringify(exams));
-  alert('تم إضافة الاختبار بنجاح');
-}
-
-// إضافة إجازة
-function addHoliday() {
-  const holidayName = prompt("أدخل اسم الإجازة:");
-  const holidayDate = prompt("أدخل تاريخ الإجازة (YYYY-MM-DD):");
-  holidays.push({ name: holidayName, date: holidayDate });
-  localStorage.setItem('holidays', JSON.stringify(holidays));
-  alert('تم إضافة الإجازة بنجاح');
-}
-
-// عرض تقارير الدرجات
-function viewGradesReport() {
-  const studentId = prompt("أدخل رقم هوية الطالب:");
-  const studentGrades = grades.filter(g => g.studentId == studentId);
-  if (studentGrades.length > 0) {
-    alert(JSON.stringify(studentGrades, null, 2));
-  } else {
-    alert('لا توجد درجات لهذا الطالب');
-  }
-}
-
-// إرسال إشعار
-function sendNotification(userId, message) {
-  notifications.push({ userId, message, timestamp: new Date() });
-  localStorage.setItem('notifications', JSON.stringify(notifications));
-  alert('تم إرسال الإشعار بنجاح');
+  doc.save('تقرير_المستخدمين.pdf');
 }
