@@ -42,7 +42,8 @@ function logout() {
 
 // إضافة مستخدم (في صفحة المدير)
 document.getElementById('user-form')?.addEventListener('submit', function (e) {
-  e.preventDefault();
+  e.preventDefault(); // منع إعادة تحميل الصفحة
+
   const userType = document.getElementById('user-type').value;
   const userName = document.getElementById('user-name').value;
   const userId = document.getElementById('user-id').value;
@@ -58,6 +59,10 @@ document.getElementById('user-form')?.addEventListener('submit', function (e) {
   users.push(newUser);
   localStorage.setItem('users', JSON.stringify(users));
   alert(`تمت إضافة المستخدم بنجاح. كلمة المرور: ${password}`);
+
+  // تحديث واجهة المستخدم
+  viewUsers();
+  document.getElementById('user-form').reset(); // إعادة تعيين النموذج
 });
 
 // عرض المستخدمين
