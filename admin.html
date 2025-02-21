@@ -16,20 +16,11 @@
       <h2>إدارة النظام</h2>
       <button onclick="showAddUserForm()">إضافة مستخدم</button>
       <button onclick="viewUsers()">عرض المستخدمين</button>
-      <button onclick="viewPasswords()">عرض كلمات السر</button>
-      <button onclick="editUser()">تعديل مستخدم</button>
-      <button onclick="deleteUser()">حذف مستخدم</button>
-      <button onclick="addCourse()">إضافة مقرر</button>
-      <button onclick="deleteCourse()">حذف مقرر</button>
-      <button onclick="assignCourseToTeacher()">تعيين مقرر للمعلم</button>
-      <button onclick="addExam()">إضافة اختبار</button>
-      <button onclick="addHoliday()">إضافة إجازة</button>
-      <button onclick="viewGradesReport()">عرض تقارير الدرجات</button>
-      <button onclick="sendNotification(prompt('أدخل رقم هوية المستخدم:'), prompt('أدخل الرسالة:'))">إرسال إشعار</button>
+      <button onclick="downloadReport()">تحميل التقرير</button>
       <button onclick="logout()">تسجيل الخروج</button>
     </section>
 
-    <section id="add-user-form">
+    <section id="add-user-form" class="hidden">
       <h2>إضافة مستخدم</h2>
       <form id="user-form">
         <label for="user-type">نوع المستخدم:</label>
@@ -38,22 +29,44 @@
           <option value="student">طالب</option>
           <option value="parent">ولي أمر</option>
         </select>
-        <label for="user-name">الاسم:</label>
-        <input type="text" id="user-name" required>
+        <label for="full-name">الاسم الكامل:</label>
+        <input type="text" id="full-name" required>
         <label for="user-id">رقم الهوية:</label>
         <input type="text" id="user-id" required>
+        <label for="gender">الجنس:</label>
+        <select id="gender">
+          <option value="male">ذكر</option>
+          <option value="female">أنثى</option>
+        </select>
+        <label for="birthdate">تاريخ الميلاد:</label>
+        <input type="date" id="birthdate" required>
+        <label for="parent-name">اسم ولي الأمر:</label>
+        <input type="text" id="parent-name">
+        <label for="phone-number">رقم الهاتف:</label>
+        <input type="tel" id="phone-number" required>
         <button type="submit">إضافة</button>
       </form>
     </section>
 
     <section id="users-list" class="hidden">
       <h2>قائمة المستخدمين</h2>
-      <ul id="users"></ul>
-    </section>
-
-    <section id="passwords-list" class="hidden">
-      <h2>كلمات سر المستخدمين</h2>
-      <ul id="passwords"></ul>
+      <table>
+        <thead>
+          <tr>
+            <th>الاسم الكامل</th>
+            <th>رقم الهوية</th>
+            <th>الجنس</th>
+            <th>تاريخ الميلاد</th>
+            <th>اسم ولي الأمر</th>
+            <th>رقم الهاتف</th>
+            <th>نوع الحساب</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="users">
+          <!-- البيانات ستضاف هنا عبر JavaScript -->
+        </tbody>
+      </table>
     </section>
   </main>
 
@@ -61,6 +74,7 @@
     <p>© 2025 SoloSchool. جميع الحقوق محفوظة.</p>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
