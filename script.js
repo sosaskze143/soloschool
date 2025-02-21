@@ -6,6 +6,18 @@ let users = JSON.parse(localStorage.getItem('users')) || [
 // بيانات الدرجات (يتم تخزينها في localStorage)
 let grades = JSON.parse(localStorage.getItem('grades')) || [];
 
+// بيانات المقررات (يتم تخزينها في localStorage)
+let courses = JSON.parse(localStorage.getItem('courses')) || [];
+
+// بيانات الاختبارات (يتم تخزينها في localStorage)
+let exams = JSON.parse(localStorage.getItem('exams')) || [];
+
+// بيانات الإجازات (يتم تخزينها في localStorage)
+let holidays = JSON.parse(localStorage.getItem('holidays')) || [];
+
+// بيانات الإشعارات (يتم تخزينها في localStorage)
+let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+
 // تسجيل الدخول
 document.getElementById('login-form')?.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -14,12 +26,19 @@ document.getElementById('login-form')?.addEventListener('submit', function (e) {
   const user = users.find(u => u.username === username && u.password === password);
 
   if (user) {
+    localStorage.setItem('currentUser', JSON.stringify(user)); // حفظ المستخدم الحالي
     alert('تم تسجيل الدخول بنجاح');
     window.location.href = `${user.role}.html`; // توجيه المستخدم للصفحة المناسبة
   } else {
     alert('اسم المستخدم أو كلمة المرور غير صحيحة');
   }
 });
+
+// تسجيل الخروج
+function logout() {
+  localStorage.removeItem('currentUser'); // حذف المستخدم الحالي من localStorage
+  window.location.href = 'index.html'; // توجيه المستخدم إلى صفحة تسجيل الدخول
+}
 
 // إضافة مستخدم (في صفحة المدير)
 document.getElementById('user-form')?.addEventListener('submit', function (e) {
@@ -53,76 +72,112 @@ function viewUsers() {
   document.getElementById('users-list').classList.remove('hidden');
 }
 
+// عرض كلمات السر
+function viewPasswords() {
+  const passwordsList = document.getElementById('passwords');
+  passwordsList.innerHTML = '';
+  users.forEach(user => {
+    const li = document.createElement('li');
+    li.textContent = `اسم المستخدم: ${user.username} - كلمة السر: ${user.password}`;
+    passwordsList.appendChild(li);
+  });
+  document.getElementById('passwords-list').classList.remove('hidden');
+}
+
+// تعديل مستخدم
+function editUser() {
+  const userId = prompt("أدخل رقم هوية المستخدم الذي تريد تعديله:");
+  const user = users.find(u => u.id == userId);
+  if (user) {
+    const newUsername = prompt("أدخل اسم المستخدم الجديد:", user.username);
+    const newPassword = prompt("أدخل كلمة السر الجديدة:", user.password);
+    user.username = newUsername;
+    user.password = newPassword;
+    localStorage.setItem('users', JSON.stringify(users));
+    alert('تم تعديل المستخدم بنجاح');
+  } else {
+    alert('المستخدم غير موجود');
+  }
+}
+
+// حذف مستخدم
+function deleteUser() {
+  const userId = prompt("أدخل رقم هوية المستخدم الذي تريد حذفه:");
+  users = users.filter(u => u.id != userId);
+  localStorage.setItem('users', JSON.stringify(users));
+  alert('تم حذف المستخدم بنجاح');
+}
+
 // توليد كلمة مرور تلقائيًا
 function generatePassword() {
   return Math.random().toString(36).slice(-8);
 }
 
-// إغلاق تسجيل الدرجات
-let gradesLocked = JSON.parse(localStorage.getItem('gradesLocked')) || false;
-
-function lockGrades() {
-  gradesLocked = true;
-  localStorage.setItem('gradesLocked', JSON.stringify(gradesLocked));
-  alert('تم إغلاق تسجيل الدرجات');
-}
-
-// فتح تسجيل الدرجات
-function unlockGrades() {
-  gradesLocked = false;
-  localStorage.setItem('gradesLocked', JSON.stringify(gradesLocked));
-  alert('تم فتح تسجيل الدرجات');
-}
-
-// إضافة درجات (في صفحة المعلم)
-document.getElementById('grade-form')?.addEventListener('submit', function (e) {
-  e.preventDefault();
-  const studentId = document.getElementById('student-id').value;
-  const courseName = document.getElementById('course-name').value;
-  const grade = document.getElementById('grade').value;
-
-  const newGrade = {
-    studentId,
-    courseName,
-    grade
-  };
-
-  grades.push(newGrade);
-  localStorage.setItem('grades', JSON.stringify(grades));
-  alert('تم إضافة الدرجة بنجاح');
-});
-
-// عرض درجات الطالب (في صفحة الطالب)
-function viewMyGrades() {
-  const studentId = 1; // يمكن تغيير هذا ليتناسب مع الطالب المسجل
-  const studentGrades = grades.filter(g => g.studentId == studentId);
-  const gradesList = document.getElementById('grades-list');
-  gradesList.innerHTML = '';
-
-  let total = 0;
-  studentGrades.forEach(grade => {
-    const li = document.createElement('li');
-    li.textContent = `${grade.courseName}: ${grade.grade}`;
-    gradesList.appendChild(li);
-    total += parseInt(grade.grade);
-  });
-
-  const average = total / studentGrades.length;
-  document.getElementById('average').textContent = `المعدل: ${average.toFixed(2)}`;
-
-  let status = '';
-  if (average >= 90) {
-    status = 'ممتاز';
-  } else if (average >= 80) {
-    status = 'جيد جدًا';
-  } else if (average >= 70) {
-    status = 'جيد';
-  } else if (average >= 60) {
-    status = 'مقبول';
-  } else {
-    status = 'راسب';
+// إضافة مقرر
+function addCourse() {
+  const courseName = prompt("أدخل اسم المقرر:");
+  if (courseName) {
+    courses.push({ name: courseName });
+    localStorage.setItem('courses', JSON.stringify(courses));
+    alert('تم إضافة المقرر بنجاح');
   }
-  document.getElementById('status').textContent = `الحالة: ${status}`;
+}
 
-  document.getElementById('my-grades').classList.remove('hidden');
+// حذف مقرر
+function deleteCourse() {
+  const courseName = prompt("أدخل اسم المقرر الذي تريد حذفه:");
+  courses = courses.filter(c => c.name != courseName);
+  localStorage.setItem('courses', JSON.stringify(courses));
+  alert('تم حذف المقرر بنجاح');
+}
+
+// تعيين مقرر للمعلم
+function assignCourseToTeacher() {
+  const teacherId = prompt("أدخل رقم هوية المعلم:");
+  const courseName = prompt("أدخل اسم المقرر:");
+  const teacher = users.find(u => u.id == teacherId && u.role == 'teacher');
+  if (teacher) {
+    teacher.courses = teacher.courses || [];
+    teacher.courses.push(courseName);
+    localStorage.setItem('users', JSON.stringify(users));
+    alert('تم تعيين المقرر للمعلم بنجاح');
+  } else {
+    alert('المعلم غير موجود');
+  }
+}
+
+// إضافة اختبار
+function addExam() {
+  const examName = prompt("أدخل اسم الاختبار:");
+  const examDate = prompt("أدخل تاريخ الاختبار (YYYY-MM-DD):");
+  exams.push({ name: examName, date: examDate });
+  localStorage.setItem('exams', JSON.stringify(exams));
+  alert('تم إضافة الاختبار بنجاح');
+}
+
+// إضافة إجازة
+function addHoliday() {
+  const holidayName = prompt("أدخل اسم الإجازة:");
+  const holidayDate = prompt("أدخل تاريخ الإجازة (YYYY-MM-DD):");
+  holidays.push({ name: holidayName, date: holidayDate });
+  localStorage.setItem('holidays', JSON.stringify(holidays));
+  alert('تم إضافة الإجازة بنجاح');
+}
+
+// عرض تقارير الدرجات
+function viewGradesReport() {
+  const studentId = prompt("أدخل رقم هوية الطالب:");
+  const studentGrades = grades.filter(g => g.studentId == studentId);
+  if (studentGrades.length > 0) {
+    alert(JSON.stringify(studentGrades, null, 2));
+  } else {
+    alert('لا توجد درجات لهذا الطالب');
+  }
+}
+
+// إرسال إشعار
+function sendNotification(userId, message) {
+  notifications.push({ userId, message, timestamp: new Date() });
+  localStorage.setItem('notifications', JSON.stringify(notifications));
+  alert('تم إرسال الإشعار بنجاح');
 }
